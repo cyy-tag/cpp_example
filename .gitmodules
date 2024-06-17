@@ -4,3 +4,9 @@
 [submodule "third/benchmark"]
 	path = third/benchmark
 	url = https://github.com/google/benchmark.git
+[submodule "src/lib/log/spdlog"]
+	path = src/lib/log/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "src/lib/json/json"]
+	path = src/lib/json/json
+	url = https://github.com/nlohmann/json.git
