@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.22.1)
+project(asio)
+set(CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 20)
+set(EXPORT_COMPILE_COMMANDS ON)
+include_directories(./asio/asio/include)
+add_executable(asio main.cpp)

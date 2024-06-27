@@ -10,3 +10,6 @@
 [submodule "src/lib/json/json"]
 	path = src/lib/json/json
 	url = https://github.com/nlohmann/json.git
+[submodule "src/lib/asio/asio"]
+	path = src/lib/asio/asio
+	url = https://github.com/chriskohlhoff/asio.git
