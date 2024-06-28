@@ -6,7 +6,7 @@ using json = nlohmann::json;
 
 /* parser json to argv format */
 int main() {
-  std::ifstream f("../array.json");
+  std::ifstream f("../config/array.json");
   std::vector<std::string> args;
   if(f.is_open()) {
     json data = json::parse(f);

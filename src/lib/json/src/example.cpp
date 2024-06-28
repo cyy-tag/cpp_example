@@ -6,7 +6,7 @@ using json = nlohmann::json;
 
 // ...
 int main() {
-  std::ifstream f("example.json");
+  std::ifstream f("../config/example.json");
   if(f.is_open()) {
     json data = json::parse(f);
     json cap_cfg = data["capture"];
