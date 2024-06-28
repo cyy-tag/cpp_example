@@ -13,3 +13,6 @@
 [submodule "src/lib/asio/asio"]
 	path = src/lib/asio/asio
 	url = https://github.com/chriskohlhoff/asio.git
+[submodule "src/lib/fmt/fmt"]
+	path = src/lib/fmt/fmt
+	url = https://github.com/fmtlib/fmt.git
