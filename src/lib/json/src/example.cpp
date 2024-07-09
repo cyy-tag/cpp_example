@@ -2,8 +2,8 @@
 #include <iostream>
 #include <string>
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
+using json = nlohmann::json;
 // ...
 int main() {
   std::ifstream f("../config/example.json");

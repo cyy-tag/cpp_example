@@ -5,6 +5,15 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+//嵌套json
+void NextJson() {
+  json data;
+  json dev_info;
+  dev_info["test"] = "tet-2123";
+  data["00:0000"] = dev_info;
+  std::cout << data << std::endl;
+}
+
 /* parser json to argv format */
 int main() {
   std::ifstream f("../config/object.json");
@@ -26,5 +35,7 @@ int main() {
   } else {
     std::cout << "can't open object.json" << std::endl;
   }
+
+  NextJson();
   return 0;
 }
