@@ -3,7 +3,7 @@
 	url = https://github.com/google/googletest.git
 [submodule "third/benchmark"]
 	path = third/benchmark
-	url = https://github.com/google/benchmark.git
+	url = git@github.com:google/benchmark.git
 [submodule "src/lib/log/spdlog"]
 	path = src/lib/log/spdlog
 	url = https://github.com/gabime/spdlog.git
