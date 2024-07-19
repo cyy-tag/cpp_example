@@ -16,3 +16,6 @@
 [submodule "src/lib/fmt/fmt"]
 	path = src/lib/fmt/fmt
 	url = https://github.com/fmtlib/fmt.git
+[submodule "src/lib/libpqxx/libpqxx"]
+	path = src/lib/libpqxx/libpqxx
+	url = https://github.com/jtv/libpqxx.git
