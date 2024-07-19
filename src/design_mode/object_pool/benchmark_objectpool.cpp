@@ -16,7 +16,10 @@ static void BM_NORMAL(benchmark::State& state) {
 
 static void BM_OBJECT_POOL(benchmark::State& state) {
   std::string data("213313");
-  ObjectPool<std::vector<Buffer>, int> object_pool(100, 100);
+  auto func = []()-> std::unique_ptr<std::vector<Buffer>> {
+    return std::make_unique<std::vector<Buffer>>(100);
+  };
+  ObjectPool<std::vector<Buffer>> object_pool(100, func);
   for(auto _ : state) {
     std::unique_ptr<std::vector<Buffer>> buf_ptr = object_pool.Get();
     for(int i = 0; i < 20; i++) {

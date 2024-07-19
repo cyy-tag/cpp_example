@@ -1,27 +1,42 @@
 #pragma once
 #include <memory>
-#include <deque>
+#include <queue>
+#include <functional>
 
-template<typename T, typename ...Args>
+template<typename T>
 class ObjectPool
 {
 public:
-  ObjectPool(size_t size, Args ... args) {
+  using CreateObjecFunc = std::function<std::unique_ptr<T>()>;
+  ObjectPool(size_t size, CreateObjecFunc func) 
+   :create_cnt_(0), create_func_(std::move(func))
+  {
     for(size_t i = 0; i < size; i++) {
-      dq_.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+      q_.push(create_func_());
     }
+    create_cnt_ = size;
+    pool_cnt_ = size;
   }
 
   inline std::unique_ptr<T> Get() {
-    std::unique_ptr<T> ret = std::move(dq_.front());
-    dq_.pop_front();
+    if(q_.empty()) {
+      ++create_cnt_;
+      return create_func_();
+    }
+    std::unique_ptr<T> ret = std::move(q_.front());
+    --pool_cnt_;
+    q_.pop();
     return ret;
   }
 
   inline void Set(std::unique_ptr<T> obj) {
-    dq_.push_back(std::move(obj));
+    ++pool_cnt_;
+    q_.push(std::move(obj));
   }
 
 private:
-  std::deque<std::unique_ptr<T>> dq_;
+  size_t create_cnt_;
+  size_t pool_cnt_;
+  CreateObjecFunc create_func_;
+  std::queue<std::unique_ptr<T>> q_;
 };
