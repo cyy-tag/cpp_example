@@ -1,3 +1,4 @@
+#include <ranges>
 #include "file.h"
 #include <iostream>
 
@@ -40,7 +41,7 @@ void File::AsyncWrite(const uint8_t *data, size_t size, WriteCallBack write_call
     [write_callback](std::error_code error, std::size_t n)
     {
       if(error){
-        std::cerr << "error write message " << error << std::endl;
+        std::cerr << "error write message " << error.message() << std::endl;
       }
       write_callback();
     });
@@ -48,11 +49,11 @@ void File::AsyncWrite(const uint8_t *data, size_t size, WriteCallBack write_call
 
 void File::AsyncWrite(std::vector<asio::const_buffer> &buffers, WriteCallBack write_callback)
 {
-  asio::async_write(file_, buffers,
+  asio::async_write(file_, std::views::all(buffers),
   [write_callback](std::error_code error, std::size_t n)
   {
     if(error){
-      std::cerr << "error write message " << error << std::endl;
+      std::cerr << "error write message " << error.message() << std::endl;
     }
     write_callback();
   });

@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD 20)
 add_definitions(
                 -DCHECK_PTHREAD_RETURN_VALUE
                 -D_FILE_OFFSET_BITS=64
+                -DASIO_HAS_IO_URING
                 -Wall
                 -O3
 								-g
@@ -24,4 +25,5 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(src/design_mode/object_pool)
 add_subdirectory(src/lib/boost)
+add_subdirectory(src/lib/asio)
 # add_subdirectory(src/grammar_example/chrono)
