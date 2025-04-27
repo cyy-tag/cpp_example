@@ -7,11 +7,19 @@
 #include <chrono>
 #include <iostream>
 
-#define NUM_WRITES 1000 // 写入操作的数量
-#define DATA_SIZE 1024 // 每个写入操作的数据大小
+using namespace std;
+// #define NUM_WRITES 16777216 // 写入操作的数量
+// #define DATA_SIZE 64 // 每个写入操作的数据大小
 
-int main() {
+int main(int argc, char *argv[]) {
     const char *filename = "bulk_data.txt"; // 目标文件名
+    if(argc < 3) {
+        printf("usage packet_size  batch total_size\n");
+        return 0;
+    }
+
+    int NUM_WRITES = atoi(argv[1]);
+    int DATA_SIZE = atoi(argv[2]);
 
     // 创建一个包含多个数据块的数组
     char **data_blocks = (char **)malloc(NUM_WRITES * sizeof(char *));
@@ -33,8 +41,18 @@ int main() {
 
     // 初始化 io_uring 实例
     struct io_uring ring;
-    if (io_uring_queue_init(1, &ring, 0) < 0) {
-        perror("Failed to initialize io_uring queue");
+    struct io_uring_params params;
+    // 初始化 io_uring_params 结构体
+    memset(&params, 0, sizeof(params));
+    // 设置 SQPOLL 标志
+    // params.flags = IORING_SETUP_SQPOLL;
+    // int ret = io_uring_setup(64, &params);
+    // if(ret < 0) {
+    //     printf("111 Failed to initialize io_uring queue %s\n", strerror(-ret));
+    //     return 0;
+    // }
+    if (int ret =  io_uring_queue_init(4096, &ring, IORING_SETUP_SQPOLL); ret < 0) {
+        printf("Failed to initialize io_uring queue %s\n", strerror(-ret));
         close(fd);
         for (int i = 0; i < NUM_WRITES; ++i) {
             free(data_blocks[i]);
@@ -43,18 +61,27 @@ int main() {
         return 1;
     }
 
+    if(IO_URING_READ_ONCE(*ring.sq.kflags) & IORING_SQ_NEED_WAKEUP) {
+        *ring.sq.kflags |= IORING_ENTER_SQ_WAKEUP;
+    }
     // 准备写入操作
     struct iovec *iovecs = (struct iovec *)malloc(NUM_WRITES * sizeof(struct iovec));
+    auto now = chrono::steady_clock::now();
     for (int i = 0; i < NUM_WRITES; ++i) {
         iovecs[i].iov_base = data_blocks[i];
         iovecs[i].iov_len = DATA_SIZE;
     }
-
+    auto finish = chrono::steady_clock::now();
+    auto cost = finish - now;
+    std::cout << " prepare buffers " << chrono::duration_cast<chrono::microseconds>(cost).count() << std::endl;
     // 获取 SQE 并准备写入操作
-    auto now = std::chrono::steady_clock::now();
     struct io_uring_sqe *sqe = io_uring_get_sqe(&ring);
+    now = chrono::steady_clock::now();
     io_uring_prep_writev(sqe, fd, iovecs, NUM_WRITES, 0); // 写入操作
-
+    finish = chrono::steady_clock::now();
+    cost = finish - now;
+    std::cout << "io_uring_prep_writev " << chrono::duration_cast<chrono::microseconds>(cost).count() << std::endl;
+    now = std::chrono::steady_clock::now();
     // 提交 SQEs 给内核
     if (io_uring_submit(&ring) < 0) {
         perror("Failed to submit IO request");
@@ -67,11 +94,12 @@ int main() {
         free(data_blocks);
         return 1;
     }
-    auto finish = std::chrono::steady_clock::now();
-    auto cost = finish - now;
-    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(cost).count() << std::endl;
+    finish = std::chrono::steady_clock::now();
+    cost = finish - now;
+    std::cout << "submit " << std::chrono::duration_cast<std::chrono::microseconds>(cost).count() << std::endl;
     // 等待 IO 完成
     struct io_uring_cqe *cqe;
+    now = std::chrono::steady_clock::now();
     if (io_uring_wait_cqe(&ring, &cqe) < 0) {
         perror("Failed to wait for IO completion");
     } else {
@@ -82,7 +110,9 @@ int main() {
         }
         io_uring_cqe_seen(&ring, cqe);
     }
-
+    finish = std::chrono::steady_clock::now();
+    cost = finish - now;
+    std::cout << "complete " << std::chrono::duration_cast<std::chrono::microseconds>(cost).count() << std::endl;
     // 清理资源
     free(iovecs);
     for (int i = 0; i < NUM_WRITES; ++i) {
