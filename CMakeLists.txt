@@ -16,7 +16,8 @@ include_directories(
             third/googletest/googlemock/include
             third/benchmark/include
             src/lib/asio/asio/asio/include
-            src/)
+            src/
+            /usr/local/src/proxy)
 
 
 link_libraries(gtest_main gtest benchmark::benchmark)
@@ -24,6 +25,7 @@ link_libraries(gtest_main gtest benchmark::benchmark)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(src/design_mode/object_pool)
-add_subdirectory(src/lib/boost)
-add_subdirectory(src/lib/asio)
+# add_subdirectory(src/lib/boost)
+# add_subdirectory(src/lib/asio)
 # add_subdirectory(src/grammar_example/chrono)
+add_subdirectory(src/grammar_example/functional)
